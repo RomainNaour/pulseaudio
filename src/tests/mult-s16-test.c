@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <math.h>
+#include <sys/reg.h>
 
 #include <pulse/rtclock.h>
 #include <pulsecore/random.h>
