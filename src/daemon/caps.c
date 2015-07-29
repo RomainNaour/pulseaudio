@@ -39,7 +39,7 @@
 #include "caps.h"
 
 /* Glibc <= 2.2 has broken unistd.h */
-#if defined(__linux__) && (__GLIBC__ <= 2 && __GLIBC_MINOR__ <= 2)
+#if defined(__linux__) && defined(__GLIBC__) && (__GLIBC__ <= 2 && __GLIBC_MINOR__ <= 2)
 int setresgid(gid_t r, gid_t e, gid_t s);
 int setresuid(uid_t r, uid_t e, uid_t s);
 #endif
