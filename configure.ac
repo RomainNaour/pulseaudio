@@ -432,6 +432,26 @@ AC_CHECK_HEADERS_ONCE([sys/atomic.h])
 
 # Other
 AC_CHECK_HEADERS_ONCE([sys/ioctl.h])
+
+# With Glibc ioctl takes an 'unsigned long' instead of the POSIX 'int'
+# for the second parameter.
+AC_CACHE_CHECK([for ioctl with POSIX signature],
+    [gl_cv_func_ioctl_posix_signature],
+    [AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM(
+        [[#include <sys/ioctl.h>]],
+        [[extern
+            #ifdef __cplusplus
+            "C"
+            #endif
+            int ioctl (int, int, ...);
+        ]])
+        ],
+        [gl_cv_func_ioctl_posix_signature=yes],
+        [gl_cv_func_ioctl_posix_signature=no])
+    ])
+AS_IF([test "x$gl_cv_func_ioctl_posix_signature" = "xyes"], AC_DEFINE([HAVE_POSIX_IOCTL], 1, [Have a POSIX ioctl?]))
+
 AC_CHECK_HEADERS_ONCE([byteswap.h])
 AC_CHECK_HEADERS_ONCE([sys/syscall.h])
 AC_CHECK_HEADERS_ONCE([sys/eventfd.h])
