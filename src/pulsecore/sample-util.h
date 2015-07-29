@@ -23,6 +23,7 @@
 
 #include <inttypes.h>
 #include <limits.h>
+#include <sys/reg.h>
 
 #include <pulse/gccmacro.h>
 #include <pulse/sample.h>
