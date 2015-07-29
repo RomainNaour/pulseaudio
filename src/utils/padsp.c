@@ -63,6 +63,7 @@
 /* make sure gcc doesn't redefine open and friends as macros */
 #undef open
 #undef open64
+#undef fopen64
 
 typedef enum {
     FD_INFO_MIXER,
