@@ -110,6 +110,10 @@ struct fd_info {
 static int dsp_drain(fd_info *i);
 static void fd_info_remove_from_list(fd_info *i);
 
+#ifdef HAVE_OPEN64
+int _stat64(const char *pathname, struct stat64 *buf);
+#endif
+
 static pthread_mutex_t fd_infos_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t func_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -128,7 +132,7 @@ static int (*___xstat)(int, const char *, struct stat *) = NULL;
 static int (*_open64)(const char *, int, mode_t) = NULL;
 static int (*___open64_2)(const char *, int) = NULL;
 static FILE* (*_fopen64)(const char *path, const char *mode) = NULL;
-static int (*_stat64)(const char *, struct stat64 *) = NULL;
+static int (*__stat64)(const char *, struct stat64 *) = NULL;
 #ifdef _STAT_VER
 static int (*___xstat64)(int, const char *, struct stat64 *) = NULL;
 #endif
@@ -210,8 +214,8 @@ do { \
 #define LOAD_STAT64_FUNC() \
 do { \
     pthread_mutex_lock(&func_mutex); \
-    if (!_stat64) \
-        _stat64 = (int (*)(const char *, struct stat64 *)) dlsym_fn(RTLD_NEXT, "stat64"); \
+    if (!__stat64) \
+        __stat64 = (int (*)(const char *, struct stat64 *)) dlsym_fn(RTLD_NEXT, "stat64"); \
     pthread_mutex_unlock(&func_mutex); \
 } while(0)
 
@@ -2483,7 +2487,7 @@ int stat(const char *pathname, struct stat *buf) {
 #endif
 #else
 #ifdef HAVE_OPEN64
-    ret = stat64("/dev", &parent);
+    ret = _stat64("/dev", &parent);
 #else
     ret = stat("/dev", &parent);
 #endif
@@ -2513,17 +2517,17 @@ int stat(const char *pathname, struct stat *buf) {
 
 #ifdef HAVE_OPEN64
 
-int stat64(const char *pathname, struct stat64 *buf) {
+int _stat64(const char *pathname, struct stat64 *buf) {
     struct stat oldbuf;
     int ret;
 
-    debug(DEBUG_LEVEL_VERBOSE, __FILE__": stat64(%s)\n", pathname?pathname:"NULL");
+    debug(DEBUG_LEVEL_VERBOSE, __FILE__": _stat64(%s)\n", pathname?pathname:"NULL");
 
     if (!pathname ||
         !buf ||
         !is_audio_device_node(pathname)) {
         LOAD_STAT64_FUNC();
-        return _stat64(pathname, buf);
+        return __stat64(pathname, buf);
     }
 
     ret = stat(pathname, &oldbuf);
@@ -2623,7 +2627,7 @@ int __xstat64(int ver, const char *pathname, struct stat64 *buf) {
         return -1;
     }
 
-    return stat64(pathname, buf);
+    return _stat64(pathname, buf);
 }
 
 #endif
