@@ -2371,7 +2371,7 @@ fail:
     return ret;
 }
 
-#ifdef sun
+#ifdef HAVE_POSIX_IOCTL
 int ioctl(int fd, int request, ...) {
 #else
 int ioctl(int fd, unsigned long request, ...) {
